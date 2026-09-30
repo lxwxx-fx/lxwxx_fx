@@ -1,6 +1,6 @@
 # Portafolio personal
 
-Portafolio responsive en **HTML, CSS y JavaScript puro** (sin frameworks ni compilación): hero con aurora animada, proyectos generados desde un array en `script.js`, barras de habilidades, tema oscuro/claro con preferencia recordada y animaciones a 60 fps que respetan `prefers-reduced-motion`.
+Portafolio responsive en **HTML, CSS y JavaScript puro** (sin frameworks ni compilación): hero con aurora animada, proyectos generados desde un array en `script.js`, habilidades agrupadas por categorías, tema oscuro/claro con preferencia recordada y animaciones a 60 fps que respetan `prefers-reduced-motion`.
 
 ## Estructura
 

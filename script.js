@@ -1,44 +1,28 @@
 // =====================================================
 // EDITA TUS PROYECTOS AQUÍ
-// Uno por objeto: nombre, descripcion, tecnologias[], enlace
+// Campos: title, description, tags[], image ("" = gradiente),
+// repo ("" = oculta "Ver código"), demo ("" = oculta "Demo"),
+// status ("" = sin insignia, ej. "En desarrollo" o "Terminado")
 // =====================================================
 const projects = [
   {
-    nombre: "Landing Page Cafetería",
-    descripcion: "Página responsive para una cafetería local con menú, mapa y formulario de contacto.",
-    tecnologias: ["HTML", "CSS", "JavaScript"],
-    enlace: "#"
+    title: "Jarvis AI - Virtual Assistant",
+    description: "Asistente virtual con reconocimiento de voz, comandos y respuestas.",
+    tags: ["Python", "SpeechRecognition", "Text-to-Speech", "OpenAI API"],
+    image: "",
+    repo: "https://github.com/lxwxx-fx/JARVIS---IA",
+    demo: "",
+    status: "Terminado"
   },
   {
-    nombre: "App de Tareas (To-Do)",
-    descripcion: "Lista de tareas con guardar en localStorage, filtros y modo oscuro.",
-    tecnologias: ["HTML", "CSS", "JS", "LocalStorage"],
-    enlace: "#"
+    title: "FluXify - Rendimiento Inteligente",
+    description: "Aplicación para android que permite gestionar el rendimiento de tu dispositivo y optimizarlo con asistente IA.",
+    tags: ["Kotlin + Compose", "Android Studio", "OpenAI API"],
+    image: "",
+    repo: "",
+    demo: "",
+    status: "En desarrollo"
   },
-  {
-    nombre: "Clon de Portafolio Minimalista",
-    descripcion: "Portafolio de ejemplo con grid de proyectos y diseño mobile-first.",
-    tecnologias: ["HTML", "CSS Grid", "JS"],
-    enlace: "#"
-  },
-  {
-    nombre: "Calculadora Web",
-    descripcion: "Calculadora funcional con teclado accesible y diseño oscuro.",
-    tecnologias: ["HTML", "CSS", "JavaScript"],
-    enlace: "#"
-  },
-  {
-    nombre: "Blog Personal",
-    descripcion: "Blog estático con artículos, categorías y buscador con JavaScript puro.",
-    tecnologias: ["HTML", "CSS", "JS"],
-    enlace: "#"
-  },
-  {
-    nombre: "Juego Piedra Papel Tijera",
-    descripcion: "Mini juego interactivo contra la computadora con marcador.",
-    tecnologias: ["HTML", "CSS", "JavaScript"],
-    enlace: "#"
-  }
 ];
 
 // ---------- Flags de entorno (rendimiento + accesibilidad) ----------
@@ -91,44 +75,72 @@ function renderProjects() {
     // Retraso escalonado por columna (0s, 0.1s, 0.2s)
     article.style.setProperty("--d", `${(i % 3) * 0.1}s`);
 
-    // Imagen opcional del proyecto (perezosa para no bloquear el render)
-    if (project.imagen) {
+    // Franja superior: captura del proyecto o gradiente de relleno
+    const media = document.createElement("div");
+    media.className = "project-media";
+    if (project.image) {
       const img = document.createElement("img");
-      img.src = project.imagen;
-      img.alt = project.alt || `Captura del proyecto ${project.nombre}`;
+      img.src = project.image;
+      img.alt = "Captura del proyecto " + project.title;
       img.loading = "lazy";
       img.decoding = "async";
       img.width = 640;
       img.height = 360;
-      article.appendChild(img);
+      media.appendChild(img);
+    } else {
+      media.classList.add("project-media-empty");
+      media.setAttribute("aria-hidden", "true");
     }
+    if (project.status) {
+      const badge = document.createElement("span");
+      badge.className = "status-badge" + (project.status === "Terminado" ? " status-done" : "");
+      badge.textContent = project.status;
+      media.appendChild(badge);
+    }
+    article.appendChild(media);
+
+    const body = document.createElement("div");
+    body.className = "project-body";
 
     const title = document.createElement("h3");
-    title.textContent = project.nombre;
+    title.textContent = project.title;
 
     const desc = document.createElement("p");
-    desc.textContent = project.descripcion;
+    desc.textContent = project.description;
 
     const techList = document.createElement("ul");
     techList.className = "tech-list";
-    techList.setAttribute("aria-label", `Tecnologías de ${project.nombre}`);
-    project.tecnologias.forEach((tech) => {
+    techList.setAttribute("aria-label", "Tecnologías de " + project.title);
+    project.tags.forEach((tag) => {
       const li = document.createElement("li");
-      li.textContent = tech;
+      li.textContent = tag;
       techList.appendChild(li);
     });
 
-    const link = document.createElement("a");
-    link.className = "project-link";
-    link.href = project.enlace;
-    link.textContent = "Ver proyecto →";
-    link.setAttribute("aria-label", `Ver proyecto ${project.nombre}`);
-    if (project.enlace.startsWith("http")) {
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-    }
+    // Botones: solo se muestran si hay URL
+    const actions = document.createElement("div");
+    actions.className = "project-actions";
+    const buttons = [
+      { url: project.repo, text: "Ver código", primary: false },
+      { url: project.demo, text: "Demo", primary: true }
+    ];
+    buttons.forEach((btn) => {
+      if (!btn.url) return;
+      const link = document.createElement("a");
+      link.className = "btn-card" + (btn.primary ? " btn-card-primary" : "");
+      link.href = btn.url;
+      link.textContent = btn.text;
+      link.setAttribute("aria-label", btn.text + " - " + project.title);
+      if (btn.url.indexOf("http") === 0) {
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+      }
+      actions.appendChild(link);
+    });
 
-    article.append(title, desc, techList, link);
+    body.append(title, desc, techList);
+    if (actions.hasChildNodes()) body.appendChild(actions);
+    article.appendChild(body);
     grid.appendChild(article);
   });
 }
@@ -160,6 +172,72 @@ function initHeroReveal() {
   });
 }
 
+// ---------- Máquina de escribir con resaltado de sintaxis ----------
+const PROFILE_CODE = [
+  "// perfil.js",
+  "const perfil = {",
+  '  nombre: "Rogger",',
+  '  rol: "Frontend",',
+  '  stack: ["HTML", "CSS", "JavaScript"],',
+  "  disponible: true, // prácticas",
+  "};"
+].join("\n");
+
+function highlightCode(src) {
+  const esc = src
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  return esc.replace(
+    /(\/\/.*$)|("(?:[^"\\]|\\.)*")|\b(true|false|null)\b|([A-Za-z_$][\w$]*)(?=\s*:)/gm,
+    (m, com, str, bool, key) => {
+      if (com) return '<span class="tok-com">' + com + "</span>";
+      if (str) return '<span class="tok-str">' + str + "</span>";
+      if (bool) return '<span class="tok-bool">' + bool + "</span>";
+      if (key) return '<span class="tok-key">' + key + "</span>";
+      return m;
+    }
+  );
+}
+
+function initTypewriter() {
+  const el = document.getElementById("typed-code");
+  if (!el) return;
+  if (reducedMotion) {
+    el.innerHTML = highlightCode(PROFILE_CODE);
+    return;
+  }
+  let i = 0;
+  const step = () => {
+    i += 2;
+    el.innerHTML = highlightCode(PROFILE_CODE.slice(0, i));
+    if (i < PROFILE_CODE.length) setTimeout(step, 32);
+  };
+  setTimeout(step, 1100);
+}
+
+// ---------- Palabras rotativas del subtítulo ----------
+function initRoleRotator() {
+  const el = document.getElementById("role-rotator");
+  if (!el) return;
+  const roles = [
+    "Desarrollador Web",
+    "Creador de Apps",
+    "Estudiante de Ing. de Software con IA"
+  ];
+  el.textContent = roles[0];
+  if (reducedMotion) return;
+  let i = 0;
+  setInterval(() => {
+    el.classList.add("rot-out");
+    setTimeout(() => {
+      i = (i + 1) % roles.length;
+      el.textContent = roles[i];
+      el.classList.remove("rot-out");
+    }, 350);
+  }, 3200);
+}
+
 // ---------- 3. Glow que sigue el cursor (rAF + lerp, solo transform/opacity) ----------
 function initCursorGlow() {
   if (!enableCursorFX) return;
@@ -177,7 +255,7 @@ function initCursorGlow() {
     }
   }, { passive: true });
 
-  document.addEventListener("mouseleave", () => {
+  document.documentElement.addEventListener("mouseleave", () => {
     shown = false;
     glow.style.opacity = "0";
   });
@@ -326,53 +404,50 @@ function initMagnetic() {
   });
 }
 
-// ---------- 8. Barras de habilidades animadas ----------
-function initSkills() {
-  const skills = document.querySelectorAll(".skill");
-  skills.forEach((skill, i) => {
-    const fill = skill.querySelector(".skill-fill");
-    if (fill) {
-      const level = parseInt(fill.dataset.level || "80", 10);
-      fill.style.setProperty("--level", (level / 100).toFixed(2));
-      skill.style.setProperty("--d", `${Math.min(i * 0.1, 0.5)}s`);
+// ---------- Copiar correo + toast ----------
+function initCopyEmail() {
+  const btn = document.getElementById("copy-email");
+  const toast = document.getElementById("toast");
+  if (!btn || !toast) return;
+
+  const email = btn.getAttribute("data-email") || "";
+  let hideTimer = null;
+
+  function showToast() {
+    toast.classList.add("show");
+    if (hideTimer) clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => toast.classList.remove("show"), 2500);
+  }
+
+  function fallbackCopy() {
+    const ta = document.createElement("textarea");
+    ta.value = email;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand("copy");
+    } catch (e) { /* portapapeles no disponible */ }
+    document.body.removeChild(ta);
+  }
+
+  btn.addEventListener("click", () => {
+    if (!email) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(email).then(showToast, () => {
+        fallbackCopy();
+        showToast();
+      });
+    } else {
+      fallbackCopy();
+      showToast();
     }
   });
-
-  const animateCount = (pctEl, target) => {
-    if (reducedMotion) {
-      pctEl.textContent = `${target}%`;
-      return;
-    }
-    const dur = 1100;
-    const start = performance.now();
-    (function tick(now) {
-      const t = Math.min((now - start) / dur, 1);
-      const eased = 1 - Math.pow(1 - t, 3);
-      pctEl.textContent = `${Math.round(target * eased)}%`;
-      if (t < 1) requestAnimationFrame(tick);
-    })(start);
-  };
-
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      const skill = entry.target;
-      skill.classList.add("visible");
-      const pctEl = skill.querySelector(".skill-pct");
-      const fillEl = skill.querySelector(".skill-fill");
-      const target = parseInt(
-        (pctEl && pctEl.dataset.pct) || (fillEl && fillEl.dataset.level) || "80",
-        10
-      );
-      if (pctEl) animateCount(pctEl, target);
-      io.unobserve(skill);
-    });
-  }, { threshold: 0.4 });
-
-  skills.forEach((s) => io.observe(s));
 }
 
-// ---------- 9. Scroll suave ----------
+// ---------- 8. Scroll suave ----------
 function initSmoothScroll() {
   document.querySelectorAll('a[href^="#"]').forEach((a) => {
     a.addEventListener("click", (e) => {
@@ -416,12 +491,14 @@ document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   renderProjects();
   initHeroReveal();
+  initTypewriter();
+  initRoleRotator();
   initCursorGlow();
   initReveal();
   initTilt();
   initNavbar();
   initMagnetic();
-  initSkills();
+  initCopyEmail();
   initSmoothScroll();
   initMenu();
   initYear();
