@@ -1,0 +1,14 @@
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*~
+
+# Dependencias y builds (el proyecto no usa ninguno, es HTML/CSS/JS puro)
+node_modules/
+dist/
+build/
