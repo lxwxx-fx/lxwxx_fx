@@ -177,7 +177,7 @@ const PROFILE_CODE = [
   "const perfil = {",
   '  nombre: "Rogger",',
   '  rol: "Frontend",',
-  '  stack: ["HTML", "CSS", "JavaScript"],',
+  '  stack: ["HTML", "CSS", "JS", "Python", "Kotlin"],',
   "  disponible: true,",
   "};"
 ].join("\n");

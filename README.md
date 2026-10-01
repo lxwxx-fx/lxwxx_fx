@@ -8,6 +8,7 @@ Portafolio responsive en **HTML, CSS y JavaScript puro** (sin frameworks ni comp
 - `styles.css` — tema oscuro/claro con variables CSS, mobile-first
 - `script.js` — array `projects`, tilt 3D, reveal on scroll, menú móvil
 - `favicon.svg` / `avatar.svg` — icono y foto de perfil (sustituibles)
+- `og-image.png` — portada 1200x630 para redes sociales
 
 ## Ver en local
 
