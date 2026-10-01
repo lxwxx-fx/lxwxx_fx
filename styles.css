@@ -66,6 +66,8 @@ body {
   font-size: 1rem;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  /* Compensa la navbar fija para que no tape el inicio del contenido */
+  padding-top: 84px;
 }
 
 img {
@@ -183,16 +185,12 @@ h1, h2, h3 {
 
 /* ============ HEADER: isla flotante ============ */
 .site-header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 50;
   padding: 16px 1rem 0;
-  transition: transform 0.35s var(--ease-out);
-}
-
-/* Al bajar rápido se oculta; al subir reaparece */
-.site-header.nav-hidden {
-  transform: translateY(-120%);
 }
 
 .island {
@@ -705,7 +703,15 @@ body.loaded .reveal-hero {
 /* Palabras rotativas del subtítulo: solo opacity + transform */
 .hero-subtitle {
   min-height: 1lh;
-  line-height: 1.35;
+  line-height: 1.25;
+  margin-bottom: 1.25rem;
+}
+
+/* En pantallas pequeñas la frase larga ocupa dos líneas: se reserva esa altura */
+@media (max-width: 640px) {
+  .hero-subtitle {
+    min-height: 2lh;
+  }
 }
 
 .rotator {
@@ -771,7 +777,8 @@ body.loaded .reveal-hero {
   text-align: left;
   white-space: pre-wrap;
   word-break: break-word;
-  min-height: 270px;
+  /* Reserva exacta de las 7 líneas del objeto: sin hueco ni salto al escribir */
+  min-height: calc(7 * 1.7em + 2.75rem);
   color: var(--text-muted);
 }
 
@@ -832,8 +839,8 @@ body.loaded .reveal-hero {
 }
 
 .chip-1 { top: -38px; left: -14px; animation-delay: -1s; }
-.chip-2 { top: 24%; right: -6px; animation-delay: -2.5s; animation-duration: 7s; }
-.chip-3 { bottom: 22%; left: -8px; animation-delay: -4s; animation-duration: 8s; }
+.chip-2 { top: 10px; right: 10px; animation-delay: -2.5s; animation-duration: 7s; }
+.chip-3 { bottom: -16px; left: -14px; animation-delay: -4s; animation-duration: 8s; }
 .chip-4 { bottom: -14px; right: 12%; animation-delay: -0.5s; animation-duration: 5.5s; }
 
 @media (min-width: 900px) {

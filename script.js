@@ -345,7 +345,6 @@ function initNavbar() {
   const sectionLinks = document.querySelectorAll("[data-section]");
   const desktopMQ = window.matchMedia("(min-width: 768px)");
   let ticking = false;
-  let lastY = window.scrollY;
   let activeLink = null;
 
   // Píldora deslizante: solo transform + width, sin recalcular layout al animar
@@ -380,15 +379,10 @@ function initNavbar() {
     if (progress) progress.style.transform = `scaleX(${p.toFixed(4)})`;
 
     if (header) {
-      // Hasta 100px: estilo original; más abajo la isla se contrae
+      // Hasta 100px: estilo original; más abajo la isla se contrae.
+      // La barra queda siempre visible: sin ocultado por dirección de scroll.
       header.classList.toggle("compact", y > 100);
-      // Se oculta al bajar rápido y reaparece al subir (nunca con el menú abierto)
-      const dy = y - lastY;
-      const menuOpen = menu && menu.classList.contains("open");
-      if (y > 150 && dy > 8 && !menuOpen) header.classList.add("nav-hidden");
-      else if (dy < -2 || y <= 150) header.classList.remove("nav-hidden");
     }
-    lastY = y;
     ticking = false;
   }
 
