@@ -174,12 +174,11 @@ function initHeroReveal() {
 
 // ---------- Máquina de escribir con resaltado de sintaxis ----------
 const PROFILE_CODE = [
-  "// perfil.js",
   "const perfil = {",
   '  nombre: "Rogger",',
   '  rol: "Frontend",',
   '  stack: ["HTML", "CSS", "JavaScript"],',
-  "  disponible: true, // prácticas",
+  "  disponible: true,",
   "};"
 ].join("\n");
 
@@ -302,7 +301,7 @@ function initReveal() {
 function initTilt() {
   if (!enableCursorFX) return;
   const cards = document.querySelectorAll(".project-card");
-  const maxTilt = 8;
+  const maxTilt = 3;
 
   cards.forEach((card) => {
     let raf = null;
