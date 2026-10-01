@@ -181,7 +181,6 @@ h1, h2, h3 {
   }
 }
 
-/* ============ HEADER / NAV (vidrio) ============ */
 /* ============ HEADER: isla flotante ============ */
 .site-header {
   position: sticky;
@@ -705,7 +704,8 @@ body.loaded .reveal-hero {
 
 /* Palabras rotativas del subtítulo: solo opacity + transform */
 .hero-subtitle {
-  min-height: 2lh;
+  min-height: 1lh;
+  line-height: 1.35;
 }
 
 .rotator {
@@ -1372,6 +1372,7 @@ body.loaded .reveal-hero {
     align-items: center;
     gap: 0.25rem;
     margin-inline: auto;
+    min-width: 0;
     opacity: 1;
     visibility: visible;
   }
@@ -1387,6 +1388,7 @@ body.loaded .reveal-hero {
     font-size: 0.98rem;
     font-weight: 500;
     padding: 0.7rem 1rem;
+    white-space: nowrap;
   }
 
   .menu-foot {
@@ -1402,7 +1404,7 @@ body.loaded .reveal-hero {
   }
 
   /* Contacto: botón pequeño con borde de gradiente */
-  .contact-cta {
+  .island-actions .contact-cta {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
@@ -1410,6 +1412,8 @@ body.loaded .reveal-hero {
     border-radius: 999px;
     font-weight: 600;
     font-size: 0.9rem;
+    white-space: nowrap;
+    flex-shrink: 0;
     color: var(--text);
     border: 1px solid transparent;
     background:
@@ -1423,6 +1427,16 @@ body.loaded .reveal-hero {
     box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
   }
 
+  /* Resaltado cuando la sección contacto está activa */
+  .island-actions .contact-cta.active {
+    color: var(--accent-text);
+    box-shadow: 0 0 0 1px var(--accent), 0 6px 20px rgba(139, 92, 246, 0.45);
+  }
+
+  .contact-link.active {
+    box-shadow: 0 0 0 2px var(--accent-2);
+  }
+
   .contact-cta .cta-arrow {
     display: inline-block;
     transition: transform 0.3s var(--ease-out);
@@ -1430,6 +1444,32 @@ body.loaded .reveal-hero {
 
   .contact-cta:hover .cta-arrow {
     transform: translate(2px, -2px);
+  }
+
+  /* Tablet estrecha (768-940px): compacta la isla para que quepa todo */
+  @media (min-width: 768px) and (max-width: 940px) {
+    .island {
+      gap: 0.5rem;
+      padding: 0.45rem 0.5rem;
+    }
+
+    .menu-links {
+      gap: 0;
+    }
+
+    .menu-links a {
+      font-size: 0.88rem;
+      padding: 0.65rem 0.7rem;
+    }
+
+    .island-actions {
+      gap: 0.4rem;
+    }
+
+    .island-actions .contact-cta {
+      font-size: 0.85rem;
+      padding: 0.5rem 0.9rem;
+    }
   }
 
   .hero {

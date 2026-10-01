@@ -14,12 +14,11 @@ Portafolio responsive en **HTML, CSS y JavaScript puro** (sin frameworks ni comp
 
 Abre `index.html` en el navegador. Sin servidor ni instalación.
 
-## Publicar en GitHub Pages
+## Publicar en Netlify
 
-1. Crea un repositorio y sube estos archivos a la rama `main`.
-2. En el repo: **Settings → Pages → Deploy from a branch → `main` / `/ (root)`**.
-3. Tu sitio quedará en `https://TU-USUARIO.github.io/NOMBRE-REPO/`.
-4. (Opcional) Para previsualizaciones ricas en redes, pon la URL absoluta final en `og:url`, `og:image` y `twitter:image` de `index.html`.
+1. Sube estos archivos al repositorio (o arrastra la carpeta a https://app.netlify.com/drop).
+2. El sitio queda en `https://rxggxr.netlify.app/` (las rutas son relativas, funcionan desde la raíz).
+3. Tras publicar, verifica `https://rxggxr.netlify.app/sitemap.xml` y `https://rxggxr.netlify.app/robots.txt`.
 
 ## Personalizar
 

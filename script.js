@@ -175,8 +175,9 @@ function initHeroReveal() {
 const PROFILE_CODE = [
   "const perfil = {",
   '  nombre: "Rogger",',
-  '  rol: "Frontend",',
+  '  rol: "Ing. de Software con IA",',
   '  stack: ["HTML", "CSS", "JS", "Python", "Kotlin"],',
+  '  enfoque: ["Web", "Apps", "IA"],',
   "  disponible: true,",
   "};"
 ].join("\n");
@@ -341,14 +342,16 @@ function initNavbar() {
   const menu = document.getElementById("nav-menu");
   const pill = menu ? menu.querySelector(".nav-pill") : null;
   const links = document.querySelectorAll(".nav-link[data-section]");
+  const sectionLinks = document.querySelectorAll("[data-section]");
   const desktopMQ = window.matchMedia("(min-width: 768px)");
   let ticking = false;
   let lastY = window.scrollY;
   let activeLink = null;
 
   // Píldora deslizante: solo transform + width, sin recalcular layout al animar
+  // (solo para enlaces del menú; el botón Contacto tiene su propio resaltado)
   function movePill(link) {
-    if (!pill || !desktopMQ.matches || !link) {
+    if (!pill || !desktopMQ.matches || !link || !link.closest(".menu-links")) {
       if (pill) pill.style.opacity = "0";
       return;
     }
@@ -361,7 +364,7 @@ function initNavbar() {
 
   function setActive(link) {
     activeLink = link;
-    links.forEach((l) => {
+    sectionLinks.forEach((l) => {
       const on = l === link;
       l.classList.toggle("active", on);
       if (on) l.setAttribute("aria-current", "true");
@@ -402,6 +405,10 @@ function initNavbar() {
     links.forEach((link) => {
       link.addEventListener("mouseenter", () => movePill(link));
     });
+    // Sobre Contacto la píldora se oculta (tiene su propio resaltado)
+    document.querySelectorAll(".contact-cta, .contact-link").forEach((cta) => {
+      cta.addEventListener("mouseenter", () => movePill(null));
+    });
     if (menu) menu.addEventListener("mouseleave", () => movePill(activeLink));
   }
   window.addEventListener("resize", () => movePill(activeLink));
@@ -417,12 +424,13 @@ function initNavbar() {
   const activeIO = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
-      const match = Array.prototype.find.call(
-        links,
+      // Resalta el enlace visible para la sección (isla en escritorio, panel en móvil)
+      const candidates = Array.prototype.filter.call(
+        sectionLinks,
         (l) => l.dataset.section === entry.target.id
       );
-      // Sin enlace para la sección (ej. contacto): se limpia el resaltado
-      setActive(match || null);
+      const visible = candidates.find((l) => l.offsetParent !== null);
+      setActive(visible || null);
     });
   }, { rootMargin: "-40% 0px -55% 0px", threshold: 0 });
 
