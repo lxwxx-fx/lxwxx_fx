@@ -972,11 +972,15 @@ body.loaded .reveal-hero {
 
 /* ============ HABILIDADES (grupos por categoría) ============ */
 .skills-groups {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 1.25rem;
 }
 
 .skill-group {
+  flex: 1 1 260px;
+  max-width: 360px;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -1246,10 +1250,7 @@ body.loaded .reveal-hero {
     width: 280px;
     height: 280px;
   }
-
-  .skills-groups {
-    grid-template-columns: repeat(3, 1fr);
-  }
+}
 
   .footer-bottom {
     flex-direction: row;
