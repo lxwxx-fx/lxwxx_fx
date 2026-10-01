@@ -41,12 +41,11 @@ function getPreferredTheme() {
 
 function applyTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
-  const btn = document.getElementById("theme-toggle");
-  if (btn) {
+  document.querySelectorAll(".theme-toggle").forEach((btn) => {
     const isLight = theme === "light";
     btn.setAttribute("aria-pressed", String(isLight));
     btn.setAttribute("aria-label", isLight ? "Cambiar a tema oscuro" : "Cambiar a tema claro");
-  }
+  });
   try {
     localStorage.setItem("theme", theme);
   } catch (e) { /* almacenamiento no disponible: el tema solo dura la sesión */ }
@@ -54,11 +53,11 @@ function applyTheme(theme) {
 
 function initTheme() {
   applyTheme(getPreferredTheme());
-  const btn = document.getElementById("theme-toggle");
-  if (!btn) return;
-  btn.addEventListener("click", () => {
-    const current = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
-    applyTheme(current === "light" ? "dark" : "light");
+  document.querySelectorAll(".theme-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+      applyTheme(current === "light" ? "dark" : "light");
+    });
   });
 }
 
@@ -335,18 +334,58 @@ function initTilt() {
   });
 }
 
-// ---------- 6. Navbar: vidrio + progreso + sección activa ----------
+// ---------- 6. Navbar: vidrio + progreso + sección activa + píldora ----------
 function initNavbar() {
   const header = document.getElementById("site-header");
   const progress = document.getElementById("scroll-progress");
+  const menu = document.getElementById("nav-menu");
+  const pill = menu ? menu.querySelector(".nav-pill") : null;
+  const links = document.querySelectorAll(".nav-link[data-section]");
+  const desktopMQ = window.matchMedia("(min-width: 768px)");
   let ticking = false;
+  let lastY = window.scrollY;
+  let activeLink = null;
+
+  // Píldora deslizante: solo transform + width, sin recalcular layout al animar
+  function movePill(link) {
+    if (!pill || !desktopMQ.matches || !link) {
+      if (pill) pill.style.opacity = "0";
+      return;
+    }
+    pill.style.opacity = "1";
+    pill.style.width = link.offsetWidth + "px";
+    pill.style.height = link.offsetHeight + "px";
+    pill.style.top = link.offsetTop + "px";
+    pill.style.transform = "translateX(" + link.offsetLeft + "px)";
+  }
+
+  function setActive(link) {
+    activeLink = link;
+    links.forEach((l) => {
+      const on = l === link;
+      l.classList.toggle("active", on);
+      if (on) l.setAttribute("aria-current", "true");
+      else l.removeAttribute("aria-current");
+    });
+    movePill(link);
+  }
 
   function onScroll() {
     const y = window.scrollY;
     const max = document.documentElement.scrollHeight - window.innerHeight;
     const p = max > 0 ? Math.min(y / max, 1) : 0;
     if (progress) progress.style.transform = `scaleX(${p.toFixed(4)})`;
-    if (header) header.classList.toggle("scrolled", y > 10);
+
+    if (header) {
+      // Hasta 100px: estilo original; más abajo la isla se contrae
+      header.classList.toggle("compact", y > 100);
+      // Se oculta al bajar rápido y reaparece al subir (nunca con el menú abierto)
+      const dy = y - lastY;
+      const menuOpen = menu && menu.classList.contains("open");
+      if (y > 150 && dy > 8 && !menuOpen) header.classList.add("nav-hidden");
+      else if (dy < -2 || y <= 150) header.classList.remove("nav-hidden");
+    }
+    lastY = y;
     ticking = false;
   }
 
@@ -358,21 +397,32 @@ function initNavbar() {
   }, { passive: true });
   onScroll();
 
+  // La píldora sigue al cursor y vuelve a la sección activa al salir
+  if (finePointer) {
+    links.forEach((link) => {
+      link.addEventListener("mouseenter", () => movePill(link));
+    });
+    if (menu) menu.addEventListener("mouseleave", () => movePill(activeLink));
+  }
+  window.addEventListener("resize", () => movePill(activeLink));
+  window.addEventListener("load", () => movePill(activeLink));
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => movePill(activeLink));
+  }
+
   // Resaltado de sección activa
-  const links = document.querySelectorAll(".nav-link[data-section]");
   const sections = document.querySelectorAll("main section[id]");
   if (!("IntersectionObserver" in window) || sections.length === 0) return;
 
   const activeIO = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        links.forEach((l) => {
-          const on = l.dataset.section === entry.target.id;
-          l.classList.toggle("active", on);
-          if (on) l.setAttribute("aria-current", "true");
-          else l.removeAttribute("aria-current");
-        });
-      }
+      if (!entry.isIntersecting) return;
+      const match = Array.prototype.find.call(
+        links,
+        (l) => l.dataset.section === entry.target.id
+      );
+      // Sin enlace para la sección (ej. contacto): se limpia el resaltado
+      setActive(match || null);
     });
   }, { rootMargin: "-40% 0px -55% 0px", threshold: 0 });
 
@@ -461,23 +511,51 @@ function initSmoothScroll() {
   });
 }
 
-// ---------- Menú móvil + año ----------
+// ---------- Menú móvil de pantalla completa + año ----------
 function initMenu() {
   const toggle = document.querySelector(".nav-toggle");
   const menu = document.getElementById("nav-menu");
   if (!toggle || !menu) return;
 
-  toggle.addEventListener("click", () => {
-    const isOpen = menu.classList.toggle("open");
-    toggle.setAttribute("aria-expanded", String(isOpen));
-    toggle.setAttribute("aria-label", isOpen ? "Cerrar menú" : "Abrir menú");
+  const links = menu.querySelectorAll("a");
+
+  function setOpen(open, returnFocus) {
+    menu.classList.toggle("open", open);
+    toggle.classList.toggle("open", open);
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
+    // Bloquea el scroll del fondo mientras el panel está abierto
+    document.body.classList.toggle("menu-open", open);
+    if (open) {
+      const first = links[0];
+      if (first) first.focus({ preventScroll: true });
+    } else if (returnFocus) {
+      toggle.focus({ preventScroll: true });
+    }
+  }
+
+  function isOpen() {
+    return menu.classList.contains("open");
+  }
+
+  toggle.addEventListener("click", () => setOpen(!isOpen()));
+
+  // Se cierra al pulsar un enlace (el scroll suave lo gestiona initSmoothScroll)
+  links.forEach((link) => {
+    link.addEventListener("click", () => setOpen(false));
   });
 
-  menu.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      menu.classList.remove("open");
-      toggle.setAttribute("aria-expanded", "false");
-    });
+  // Se cierra al pulsar fuera del panel
+  menu.addEventListener("click", (e) => {
+    if (e.target === menu) setOpen(false);
+  });
+  document.addEventListener("click", (e) => {
+    if (isOpen() && !e.target.closest(".site-header")) setOpen(false);
+  });
+
+  // Se cierra con Escape y devuelve el foco al botón
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && isOpen()) setOpen(false, true);
   });
 }
 
